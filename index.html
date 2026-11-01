@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>HVK TF Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#F4F6FA;--card:#FFFFFF;--ink:#0F172A;--muted:#64748B;--line:#E2E8F0;--soft:#F1F5F9;
+  --pos:#15803D;--pos-bg:#DCFCE7;--neg:#B91C1C;--neg-bg:#FEE2E2;--accent:#2563EB;
+  --p1:#2563EB;--p2:#F97316;--p3:#16A34A;--p4:#9333EA;--p5:#DB2777;--pc:#0F172A;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0B1120;--card:#111827;--ink:#E5E7EB;--muted:#94A3B8;--line:#1F2937;--soft:#0F172A;
+  --pos:#4ADE80;--pos-bg:#052E16;--neg:#F87171;--neg-bg:#450A0A;--accent:#60A5FA;--pc:#F8FAFC;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+h1{font-size:20px;margin:0;letter-spacing:-.01em}
+h1 small{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:2px}
+.meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.pill{padding:4px 10px;border-radius:999px;background:var(--soft);border:1px solid var(--line);white-space:nowrap}
+.pill.live{color:var(--pos);border-color:var(--pos)}
+.pill.err{color:var(--neg);border-color:var(--neg)}
+button{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+.grid{display:grid;gap:14px}
+.tiles{grid-template-columns:repeat(6,minmax(0,1fr))}
+.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:1000px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}.two{grid-template-columns:1fr}}
+@media (max-width:560px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.card h2{font-size:13px;font-weight:600;margin:0 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.tile{border-top:4px solid var(--c)}
+.tile .nm{font-weight:600;font-size:13px;color:var(--c)}
+.tile .v{font:600 22px/1.2 "JetBrains Mono",monospace;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px;color:var(--muted)}
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;background:var(--soft);color:var(--muted);margin-top:6px}
+.chip.on{background:var(--pos-bg);color:var(--pos)} .chip.bad{background:var(--neg-bg);color:var(--neg)}
+.pos{color:var(--pos)} .neg{color:var(--neg)}
+section{margin-top:14px}
+.chartbox{position:relative;height:300px} .chartbox.sm{height:240px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
+#kpi{font-size:12.5px}
+th,td{padding:6px 6px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{font-size:12px;color:var(--muted);font-weight:600}
+.scroll{overflow-x:auto}
+.cal{display:grid;grid-template-columns:70px repeat(31,minmax(18px,1fr));gap:3px;font-size:10px;min-width:720px}
+.cal div{height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.cal .m{justify-content:flex-start;font-weight:600;color:var(--ink);font-size:12px}
+select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.row h2{margin:0}
+.note{font-size:12px;color:var(--muted);margin-top:12px}
+#gate{display:none;max-width:340px;margin:15vh auto;text-align:center}
+#gate input{width:100%;font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);margin:12px 0;background:var(--card);color:var(--ink)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:7px 12px;background:var(--card);color:var(--muted)}
+.seg button.on{background:var(--accent);color:#fff}
+.tile .alt{font-size:12px;font-weight:600;font-family:"JetBrains Mono",monospace}
+.unit{font-size:12px;padding:4px 6px}
+.ctl{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.card .row h2{margin:0}
+.card>.row{margin-bottom:10px}
+.empty{display:none;position:absolute;inset:0;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--muted);font-size:13px}
+#banner{display:none;margin-bottom:12px;padding:10px 12px;border-radius:10px;background:var(--neg-bg);color:var(--neg);font-size:13px}
+</style>
+</head>
+<body>
+<div id="gate" class="card"><h1>HVK TF Dashboard</h1><input id="pw" type="password" placeholder="Password" autocomplete="current-password"><button id="go">Open</button></div>
+<div class="wrap" id="app">
+  <header>
+    <h1>HVK Trades · TF Part 1–5<small>Live P&amp;L via Tradetron Developer API · updated every 15 min in market hours</small></h1>
+    <div class="meta">
+      <span class="pill" id="mkt">—</span>
+      <span class="pill" id="upd">Loading…</span>
+      <span class="pill" id="chk">—</span>
+      <span class="pill" id="next">—</span>
+      <span class="seg" role="group" aria-label="Show values as"><button id="mAmt">₹</button><button id="mPct">%</button></span>
+      <button id="refresh" title="Load the latest saved reading">Refresh now</button>
+    </div>
+  </header>
+  <div id="banner"></div>
+
+  <div class="grid tiles" id="tiles"></div>
+
+  <section class="grid two">
+    <div class="card"><div class="row"><h2 id="intraT">Combined P&amp;L through the day</h2><select class="unit" data-sec="intra" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="chartbox sm"><canvas id="cIntra"></canvas><div id="intraEmpty" class="empty">No 15-minute readings for this day yet — the tiles show its end-of-day P&amp;L. The curve fills in from the next trading session.</div></div></div>
+    <div class="card"><div class="row"><h2>Key numbers (all history)</h2><select class="unit" data-sec="kpi" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="scroll"><table id="kpi"></table></div></div>
+  </section>
+
+  <section class="card"><div class="row"><h2>Equity curves — cumulative P&amp;L</h2><select class="unit" data-sec="eq" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="chartbox"><canvas id="cEq"></canvas></div></section>
+
+  <section class="grid two">
+    <div class="card"><div class="row"><h2>Combined drawdown from peak</h2><select class="unit" data-sec="dd" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="chartbox sm"><canvas id="cDD"></canvas></div></div>
+    <div class="card"><div class="row"><h2>Combined daily P&amp;L</h2><select class="unit" data-sec="daily" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="chartbox sm"><canvas id="cDaily"></canvas></div></div>
+  </section>
+
+  <section class="grid two">
+    <div class="card"><div class="row"><h2>Monthly P&amp;L by part</h2><select class="unit" data-sec="mon" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="chartbox sm"><canvas id="cMon"></canvas></div></div>
+    <div class="card"><div class="row"><h2>Monthly table</h2><select class="unit" data-sec="monT" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="scroll"><table id="mon"></table></div></div>
+  </section>
+
+  <section class="card">
+    <div class="row"><h2>Daily calendar</h2><span class="ctl"><select id="calSel" aria-label="Strategy"></select><select class="unit" data-sec="cal" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></span></div>
+    <div class="scroll"><div class="cal" id="cal"></div></div>
+  </section>
+
+  <p class="note">P&amp;L is Tradetron's mark-to-market figure (includes open positions at their latest mark), not settled profit. History up to 30-Oct-2026 comes from Tradetron's reconciled daily data; from then on each day's figure is the last 15-minute reading of that day (GitHub can start a reading a few minutes late). Days where no TF part traded are not recorded. When no part has traded yet (evenings, weekends, holidays, early morning), the tiles keep showing the last session that traded, with its date and time; “Checked” shows when Tradetron was last asked. Percentages are of deployed capital: ₹4L per part, ₹20L combined (all five parts).</p>
+</div>
+
+<script>
+const STRATS=[["30168334","TF Part 1","--p1"],["30168338","TF Part 2","--p2"],["30168342","TF Part 3","--p3"],["30169714","TF Part 4","--p4"],["31353714","TF Part 5","--p5"]];
+const CAP=400000, REFRESH_MS=15*60*1000;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const COLS=()=>[...STRATS.map(s=>css(s[2])),css("--pc")];
+const NAMES=[...STRATS.map(s=>s[1]),"Combined"];
+const inr=(v,d=0)=>v==null||isNaN(v)?"—":(v<0?"-":"")+"₹"+Math.abs(v).toLocaleString("en-IN",{maximumFractionDigits:d});
+const short=v=>{const a=Math.abs(v),s=v<0?"-":"";return a>=1e5?s+"₹"+(a/1e5).toFixed(1)+"L":a>=1e3?s+"₹"+(a/1e3).toFixed(0)+"k":s+"₹"+a.toFixed(0)};
+const pct=v=>v==null||!isFinite(v)?"—":(v*100).toFixed(1)+"%";
+const fmtD=d=>new Date(d+"T00:00:00Z").toLocaleString("en-IN",{day:"numeric",month:"short",timeZone:"UTC"});
+const cls=v=>v>0?"pos":v<0?"neg":"";
+let GLOBAL=false; try{GLOBAL=localStorage.getItem("hvk_mode")==="pct"}catch(e){}
+let U={}; try{U=JSON.parse(localStorage.getItem("hvk_units")||"{}")||{}}catch(e){}
+const isP=sec=>U[sec]!=null?U[sec]:GLOBAL;      // each section's own unit, else the top switch
+let PCT=GLOBAL;                                 // unit of the section being drawn right now
+const sp=(f,d=2)=>f==null||!isFinite(f)?"—":(f>0?"+":"")+(f*100).toFixed(d)+"%";       // signed % from a fraction
+const V=(v,cap,d)=>v==null||isNaN(v)?"—":PCT?sp(v/cap,d):inr(v);                         // value in the chosen unit
+const OTHER=(v,cap)=>v==null||isNaN(v)?"":PCT?inr(v):sp(v/cap);                          // the other unit
+const SC=(arr,cap)=>PCT?arr.map(v=>v==null?null:v/cap):arr;                              // scale a data series
+const axisFor=p=>v=>p?(+(v*100).toFixed(Math.abs(v)<0.1?1:0))+"%":short(v);
+const tipFor=p=>v=>p?sp(v):inr(v);
+let pass=null; try{pass=localStorage.getItem("hvk_pass")}catch(e){}
+let seed=null, charts={}, nextAt=0;
+
+// GitHub Pages version: data/live.json is rewritten every 15 min by the GitHub Actions job.
+async function api(){
+  const r=await fetch("data/live.json?ts="+Date.now(),{cache:"no-store"});
+  if(!r.ok) throw new Error("data file HTTP "+r.status);
+  const j=await r.json();
+  return {ok:true,latest:j.latest,lastCheck:j.lastCheck,intraday:j.latest?(j.intraday||[]):[],days:j.days||[],lastError:j.lastError,refreshError:null};
+}
+function showGate(){document.getElementById("app").style.display="none";document.getElementById("gate").style.display="block"}
+document.getElementById("go").onclick=()=>{pass=document.getElementById("pw").value;try{localStorage.setItem("hvk_pass",pass)}catch(e){};document.getElementById("gate").style.display="none";document.getElementById("app").style.display="block";load(true)};
+
+function mergeHistory(days){
+  const map=new Map(seed.history.map(h=>[h.date,h.pnl]));
+  for(const d of days||[]) if(d&&d.date) map.set(d.date,d.pnl);
+  return [...map.entries()].sort((a,b)=>a[0]<b[0]?-1:1).map(([date,pnl])=>({date,pnl}));
+}
+function series(hist){
+  const s=STRATS.map(([id])=>hist.map(h=>h.pnl[id]==null?null:+h.pnl[id]));
+  s.push(hist.map((h,i)=>{let t=0,any=false;for(const x of s){if(x[i]!=null){t+=x[i];any=true}}return any?t:null}));
+  return s;
+}
+function stats(x,cap){
+  const v=x.filter(a=>a!=null), tr=v.filter(a=>a!==0);
+  let c=0,pk=0,mdd=0; for(const a of v){c+=a;pk=Math.max(pk,c);mdd=Math.min(mdd,c-pk)}
+  const w=tr.filter(a=>a>0),l=tr.filter(a=>a<0),gp=w.reduce((a,b)=>a+b,0),gl=-l.reduce((a,b)=>a+b,0);
+  const m=v.reduce((a,b)=>a+b,0)/(v.length||1), sd=Math.sqrt(v.reduce((a,b)=>a+(b-m)**2,0)/Math.max(1,v.length-1));
+  return {pnl:c,roi:c/cap,wr:tr.length?w.length/tr.length:null,pf:gl?gp/gl:null,sh:sd?m/sd*Math.sqrt(252):null,mdd,cur:c-pk,best:Math.max(...v),worst:Math.min(...v)};
+}
+function cum(x){let c=0;return x.map(a=>a==null?null:(c+=a))}
+
+function mk(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg)}
+function baseOpts(legend=true){
+  const g=css("--line"),t=css("--muted"),axisF=axisFor(PCT),tipF=tipFor(PCT);
+  return {responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:"index",intersect:false},
+    plugins:{legend:{display:legend,labels:{color:t,boxWidth:12,usePointStyle:true}},tooltip:{callbacks:{title:it=>{const l=it[0]&&it[0].label;return /^\d{4}-/.test(l)?fmtD(l)+" "+l.slice(0,4):l},label:c=>`${c.dataset.label}: ${tipF(c.parsed.y)}`}}},
+    scales:{x:{ticks:{color:t,maxTicksLimit:7,autoSkip:true,maxRotation:0,callback:function(v){const l=this.getLabelForValue(v);return /^\d{4}-\d\d-\d\d$/.test(l)?fmtD(l):l}},grid:{display:false}},y:{ticks:{color:t,callback:axisF},grid:{color:g}}}};
+}
+
+function render(data){
+  const hist=mergeHistory(data.days), S=series(hist), labels=hist.map(h=>h.date), C=COLS();
+  // Latest session that actually traded: live reading if we have one, else the last traded day in history.
+  const todayIST=new Date(Date.now()+5.5*36e5).toISOString().slice(0,10);
+  let latest=data.latest;
+  if(!latest){
+    for(let i=hist.length-1;i>=0;i--){const pn=hist[i].pnl;if(Object.values(pn).some(v=>v)){latest={date:hist[i].date,time:null,pnl:pn,eod:true};break}}
+  }
+  const dayLbl=d=>d===todayIST?"Today":new Date(d+"T00:00:00Z").toLocaleString("en-IN",{weekday:"short",day:"numeric",month:"short",timeZone:"UTC"});
+  const sessLbl=latest?`${dayLbl(latest.date)}${latest.time?" · "+latest.time+" IST":" · end of day"}`:"";
+  const chk=data.lastCheck;
+  const statusMap=(chk&&chk.status)||(latest&&latest.status)||{};
+  // header
+  const ist=new Date(Date.now()+5.5*36e5), dow=ist.getUTCDay(), hm=ist.getUTCHours()*60+ist.getUTCMinutes();
+  const open=dow>=1&&dow<=5&&hm>=555&&hm<=930;
+  const mk_=document.getElementById("mkt"); mk_.textContent=open?"● Market open":"Market closed"; mk_.className="pill"+(open?" live":"");
+  document.getElementById("upd").textContent=latest?`Showing ${sessLbl}`:"No data yet";
+  document.getElementById("chk").textContent=chk?`Checked ${dayLbl(chk.date)} ${chk.time} IST`:"Not checked yet";
+  document.getElementById("intraT").textContent=latest?`Combined P&L through the day — ${dayLbl(latest.date)}`:"Combined P&L through the day";
+  const b=document.getElementById("banner");
+  const err=data.refreshError||(chk&&chk.statusError)||(data.lastError&&(!chk||data.lastError.at>chk.at)?data.lastError.error:null);
+  b.style.display=err?"block":"none"; b.textContent=err?"Tradetron API: "+err:"";
+
+  document.querySelectorAll("select.unit").forEach(el=>el.value=isP(el.dataset.sec)?"pct":"amt");
+  // tiles: today's live P&L (follow the top switch)
+  PCT=GLOBAL;
+  const today=latest&&latest.pnl||{}; let tot=0,anyT=false;
+  const tiles=STRATS.map(([id,nm,v],k)=>{
+    const p=today[id]; if(p!=null){tot+=p;anyT=true}
+    const st=statusMap[id]; const s=st&&st.status?String(st.status):"";
+    const sc=/error|block/i.test(s)?"bad":/live|enter|active/i.test(s)?"on":"";
+    const all=stats(S[k],CAP);
+    return `<div class="card tile" style="--c:${css(v)}"><div class="nm">${nm}</div><div class="v ${cls(p)}">${V(p,CAP)}</div><div class="alt ${cls(p)}">${OTHER(p,CAP)}</div><div class="s">${latest?dayLbl(latest.date):""} · total ${PCT?sp(all.roi,1):short(all.pnl)}</div>${s?`<span class="chip ${sc}">${s}</span>`:""}</div>`;
+  });
+  const allC=stats(S[5],CAP*5);
+  tiles.push(`<div class="card tile" style="--c:${css("--pc")}"><div class="nm">Combined</div><div class="v ${cls(tot)}">${anyT?V(tot,CAP*5):"—"}</div><div class="alt ${cls(tot)}">${anyT?OTHER(tot,CAP*5):""}</div><div class="s">${latest?dayLbl(latest.date):""} · total ${PCT?sp(allC.roi,1):short(allC.pnl)}</div><span class="chip">ROI ${pct(allC.roi)} on ₹20L</span></div>`);
+  document.getElementById("tiles").innerHTML=tiles.join("");
+
+  // intraday
+  PCT=isP("intra");
+  const it=(data.latest&&data.intraday)||[];
+  document.getElementById("intraEmpty").style.display=it.length?"none":"flex"; document.getElementById("cIntra").style.visibility=it.length?"visible":"hidden";
+  mk("cIntra",{type:"line",data:{labels:it.map(p=>p.t),datasets:[{label:"Combined",data:SC(it.map(p=>p.total),CAP*5),borderColor:C[5],borderWidth:2.5,pointRadius:2,fill:{target:"origin",above:css("--pos-bg"),below:css("--neg-bg")},tension:.2}]},options:(o=>{o.scales.y.beginAtZero=true;return o})(baseOpts(false))});
+
+  // KPI table
+  PCT=isP("kpi");
+  const st=S.map((x,k)=>stats(x,k<5?CAP:CAP*5));
+  const rows=[[PCT?"Total return":"Total P&L",(s,c)=>`<span class="${cls(s.pnl)}">${V(s.pnl,c,1)}</span>`],...(PCT?[]:[["ROI on capital",s=>pct(s.roi)]]),["Win rate",s=>pct(s.wr)],["Profit factor",s=>s.pf?.toFixed(2)??"—"],["Sharpe (ann.)",s=>s.sh?.toFixed(2)??"—"],["Max drawdown",(s,c)=>`<span class="neg">${V(s.mdd,c)}</span>`],["Current drawdown",(s,c)=>s.cur<0?`<span class="neg">${V(s.cur,c)}</span>`:"At peak"],["Best day",(s,c)=>V(s.best,c)],["Worst day",(s,c)=>V(s.worst,c)]];
+  document.getElementById("kpi").innerHTML=`<thead><tr><th></th>${NAMES.map((n,k)=>`<th style="color:${C[k]}">${n.replace("TF Part ","P")}</th>`).join("")}</tr></thead><tbody>${rows.map(([l,f])=>`<tr><td>${l}</td>${st.map((s,k)=>`<td>${f(s,k<5?CAP:CAP*5)}</td>`).join("")}</tr>`).join("")}</tbody>`;
+
+  // equity
+  PCT=isP("eq");
+  mk("cEq",{type:"line",data:{labels,datasets:S.map((x,k)=>({label:NAMES[k],data:SC(cum(x),k<5?CAP:CAP*5),borderColor:C[k],backgroundColor:C[k],borderWidth:k===5?3:1.8,pointRadius:0,spanGaps:false}))},options:baseOpts()});
+
+  // drawdown
+  PCT=isP("dd");
+  let pk=0; const dd=cum(S[5]).map(v=>{if(v==null)return null;pk=Math.max(pk,v);return v-pk});
+  mk("cDD",{type:"line",data:{labels,datasets:[{label:"Drawdown",data:SC(dd,CAP*5),borderColor:css("--neg"),backgroundColor:css("--neg-bg"),fill:"origin",pointRadius:0,borderWidth:1.5}]},options:baseOpts(false)});
+
+  // daily bars
+  PCT=isP("daily");
+  mk("cDaily",{type:"bar",data:{labels,datasets:[{label:"Combined",data:SC(S[5],CAP*5),backgroundColor:S[5].map(v=>v>=0?css("--pos"):css("--neg"))}]},options:baseOpts(false)});
+
+  // monthly
+  PCT=isP("mon");
+  const months=[...new Set(labels.map(d=>d.slice(0,7)))];
+  const M=S.map(x=>months.map(m=>{let a=0,any=false;x.forEach((v,i)=>{if(labels[i].startsWith(m)&&v!=null){a+=v;any=true}});return any?a:null}));
+  const mlab=months.map(m=>new Date(m+"-01T00:00:00Z").toLocaleString("en-IN",{month:"short",year:"2-digit",timeZone:"UTC"}));
+  mk("cMon",{type:"bar",data:{labels:mlab,datasets:M.slice(0,5).map((x,k)=>({label:NAMES[k],data:SC(x,CAP),backgroundColor:C[k]}))},options:baseOpts()});
+  PCT=isP("monT");
+  document.getElementById("mon").innerHTML=`<thead><tr><th>Month</th>${NAMES.map((n,k)=>`<th style="color:${C[k]}">${n.replace("TF Part ","P")}</th>`).join("")}</tr></thead><tbody>${months.map((m,i)=>`<tr><td>${mlab[i]}</td>${M.map((x,k)=>`<td class="${cls(x[i])}">${V(x[i],k<5?CAP:CAP*5)}</td>`).join("")}</tr>`).join("")}</tbody>`;
+
+  // calendar
+  PCT=isP("cal");
+  const sel=document.getElementById("calSel");
+  if(!sel.options.length){NAMES.forEach((n,k)=>sel.add(new Option(n,k)));sel.value=5;sel.onchange=()=>render(lastData)}
+  const k=+sel.value, byDate=new Map(labels.map((d,i)=>[d,S[k][i]])), lim=k===5?20000:10000, ccap=k===5?CAP*5:CAP;
+  let html=`<div></div>${Array.from({length:31},(_,i)=>`<div>${i+1}</div>`).join("")}`;
+  for(const m of months){
+    html+=`<div class="m">${new Date(m+"-01T00:00:00Z").toLocaleString("en-IN",{month:"short",year:"2-digit",timeZone:"UTC"})}</div>`;
+    for(let d=1;d<=31;d++){
+      const key=`${m}-${String(d).padStart(2,"0")}`, v=byDate.get(key);
+      if(v==null){html+=`<div></div>`;continue}
+      const a=Math.min(1,Math.abs(v)/lim), bg=v>0?`rgba(22,163,74,${.15+.75*a})`:v<0?`rgba(220,38,38,${.15+.75*a})`:css("--soft");
+      html+=`<div title="${key}: ${inr(v)} (${sp(v/ccap)})" style="background:${bg};color:${a>.55?"#fff":"inherit"}">${v===0?"·":PCT?(Math.abs(v/ccap)<0.001?(v/ccap*100).toFixed(2):(v/ccap*100).toFixed(1)):short(v).replace("₹","")}</div>`;
+    }
+  }
+  document.getElementById("cal").innerHTML=html;
+  PCT=GLOBAL;
+}
+
+let lastData=null;
+async function load(fresh){
+  const btn=document.getElementById("refresh"); btn.disabled=true;
+  try{
+    if(!seed) seed=await (await fetch("seed.json",{cache:"no-store"})).json();
+    lastData=await api(fresh?"?refresh=1":"");
+    render(lastData);
+  }catch(e){ if(String(e.message)!=="password"){const b=document.getElementById("banner");b.style.display="block";b.textContent="Could not load: "+e.message; if(seed&&!lastData){lastData={days:[],intraday:[]};render(lastData)}} }
+  finally{btn.disabled=false; nextAt=Date.now()+REFRESH_MS}
+}
+document.getElementById("refresh").onclick=()=>load(true);
+const saveU=()=>{try{localStorage.setItem("hvk_units",JSON.stringify(U))}catch(e){}};
+function setMode(p,reset=true){GLOBAL=p;PCT=p;if(reset){U={};saveU()}try{localStorage.setItem("hvk_mode",p?"pct":"amt")}catch(e){};document.getElementById("mPct").className=p?"on":"";document.getElementById("mAmt").className=p?"":"on";if(lastData)render(lastData)}
+document.querySelectorAll("select.unit").forEach(el=>el.onchange=()=>{U[el.dataset.sec]=el.value==="pct";saveU();if(lastData)render(lastData)});
+document.getElementById("mAmt").onclick=()=>setMode(false); document.getElementById("mPct").onclick=()=>setMode(true); setMode(GLOBAL,false);
+setInterval(()=>{const s=Math.max(0,Math.round((nextAt-Date.now())/1000));document.getElementById("next").textContent=`Next refresh ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;if(nextAt&&Date.now()>=nextAt)load(true)},1000);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>lastData&&render(lastData));
+load(true);
+</script>
+</body>
+</html>
