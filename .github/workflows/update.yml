@@ -1,0 +1,40 @@
+name: Update TF dashboard data
+
+on:
+  schedule:
+    # every 15 min, Mon–Fri, 08:30–16:15 IST (03:00–10:45 UTC). GitHub may start runs a few minutes late.
+    - cron: "*/15 3-10 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      show_raw:
+        description: "Print Tradetron's raw live-pnl response in the log (to check field names)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tf-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Read Tradetron
+        env:
+          TT_API_KEY: ${{ secrets.TT_API_KEY }}
+          SHOW_RAW: ${{ inputs.show_raw && '1' || '' }}
+        run: node scripts/update.mjs
+      - name: Save data
+        if: always()
+        run: |
+          git config user.name "tf-dashboard-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet || (git commit -m "data: $(TZ=Asia/Kolkata date '+%d %b %H:%M IST')" && git push)
