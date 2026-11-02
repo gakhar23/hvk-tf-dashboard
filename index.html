@@ -70,6 +70,26 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
 .card .row h2{margin:0}
 .card>.row{margin-bottom:10px}
 .empty{display:none;position:absolute;inset:0;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:0 0 16px;overflow-x:auto}
+.tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;color:var(--muted);padding:10px 14px;white-space:nowrap}
+.tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tabs button:hover{color:var(--ink)}
+.panel{display:none}.panel.on{display:block}
+.prose{font-size:14px;line-height:1.6;max-width:860px}
+.prose h3{font-size:15px;margin:18px 0 6px}.prose h3:first-child{margin-top:0}
+.prose p{margin:0 0 10px}.prose ul{margin:0 0 10px;padding-left:20px}
+.prose .muted{color:var(--muted);font-size:13px}
+.ddgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:8px 0 12px}
+@media (max-width:700px){.ddgrid{grid-template-columns:1fr}}
+.ddgrid div{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.ddgrid b{display:block;font:600 18px "JetBrains Mono",monospace;margin-top:2px}
+.disc{font-size:12.5px;line-height:1.6;color:var(--muted)}
+.disc p{margin:0 0 8px}
+.codes td{white-space:normal}
+.code{font:500 13px "JetBrains Mono",monospace;word-break:break-all;background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:4px 8px;display:inline-block}
+.copy{padding:5px 10px;font-size:12px}
+.copy.done{color:var(--pos);border-color:var(--pos)}
+.cta{display:inline-block;margin-top:4px;padding:8px 14px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
 #banner{display:none;margin-bottom:12px;padding:10px 12px;border-radius:10px;background:var(--neg-bg);color:var(--neg);font-size:13px}
 </style>
 </head>
@@ -77,17 +97,23 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
 <div id="gate" class="card"><h1>HVK TF Dashboard</h1><input id="pw" type="password" placeholder="Password" autocomplete="current-password"><button id="go">Open</button></div>
 <div class="wrap" id="app">
   <header>
-    <h1>HVK Trades · TF Part 1–5<small>Live P&amp;L via Tradetron Developer API · updated every 15 min in market hours</small></h1>
+    <h1>HVK Trades · TF Part 1–5<small>Trend-Following series · live P&amp;L</small></h1>
     <div class="meta">
       <span class="pill" id="mkt">—</span>
       <span class="pill" id="upd">Loading…</span>
       <span class="pill" id="chk">—</span>
       <span class="pill" id="next">—</span>
       <span class="seg" role="group" aria-label="Show values as"><button id="mAmt">₹</button><button id="mPct">%</button></span>
-      <button id="refresh" title="Load the latest saved reading">Refresh now</button>
     </div>
   </header>
   <div id="banner"></div>
+  <nav class="tabs" role="tablist">
+    <button data-tab="analytics" class="on">Analytics</button>
+    <button data-tab="codes">Strategy Codes</button>
+    <button data-tab="updates">Updates</button>
+  </nav>
+
+  <div class="panel on" id="tab-analytics">
 
   <div class="grid tiles" id="tiles"></div>
 
@@ -113,7 +139,62 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
     <div class="scroll"><div class="cal" id="cal"></div></div>
   </section>
 
-  <p class="note">P&amp;L is Tradetron's mark-to-market figure (includes open positions at their latest mark), not settled profit. History up to 30-Oct-2026 comes from Tradetron's reconciled daily data; from then on each day's figure is the last 15-minute reading of that day (GitHub can start a reading a few minutes late). Days where no TF part traded are not recorded. When no part has traded yet (evenings, weekends, holidays, early morning), the tiles keep showing the last session that traded, with its date and time; “Checked” shows when Tradetron was last asked. Percentages are of deployed capital: ₹4L per part, ₹20L combined (all five parts).</p>
+  <section class="card"><h2>About the TF series</h2><div class="prose">
+    <p>The TF series is primarily a <b>directional (trend-following)</b> strategy series, with a minor non-directional stance built in. Please keep this character in mind when you judge its behaviour across different market conditions.</p>
+    <p>We run these strategies live in our own personal account as well, and keep working to optimise them further.</p>
+    <h3>Expected drawdowns</h3>
+    <div class="ddgrid"><div>Individual part<b>8–12%</b></div><div>Part 1–4 combo<b>8–10%</b></div><div>Suggested allocation<b>≤ 10–15%</b><span class="muted">of your total capital</span></div></div>
+    <p>These figures come from our past data analysis. They are indicative, not a ceiling: in adverse or unusual markets the actual drawdown can go deeper. Treat them as normal, expected behaviour for this style of strategy, and deploy only once you are comfortable with a larger drawdown in a worst case. Size your deployment strictly to your own risk appetite.</p>
+    <h3>Running at your own discretion</h3>
+    <p>If on a particular day you feel the strategy may not suit you, you are free to pause or adjust. Your returns may then differ from full everyday live deployment, and your drawdown may be more or less than ours.</p>
+    <h3>Backtests</h3>
+    <p>Each part is itself a blend of several strategies, so we don't share per-part backtests: that would expose the underlying logic and erode the edge for every subscriber. The combined Part 1–4 portfolio also cannot be backtested on Tradetron because of platform limits. If you'd like more evidence, watching the live daily P&amp;L here for a while before deploying is often the wiser choice.</p>
+    <p class="muted">Percentages on this page are of deployed capital: ₹4L per part, ₹20L for all five parts combined. Daily P&amp;L reflects our live deployment on Tradetron; your results may vary with slippage, broker API latency and costs.</p>
+  </div></section>
+
+  <section class="card"><h2>Disclaimer</h2><div class="disc">
+    <p>HVK Trades and its team are not SEBI-registered investment advisors, financial advisors, or portfolio managers. Nothing shared here — including strategies, backtest results, daily PnL sheets, or any other broadcast — constitutes financial, trading, or investment advice, or a recommendation or solicitation to deploy any strategy. All content is provided in good faith for educational and informational purposes only.</p>
+    <p>Trading in equities, futures, options, and currencies carries substantial risk along with potential rewards. Do not deploy any strategy until you fully understand the risks involved, and never trade with money you cannot afford to lose. Derivatives are sophisticated products; consider all risk factors and read all related documents carefully before trading.</p>
+    <p>Past performance — good or poor — is no guarantee of future results. Although our algos are fully automated, you are advised to monitor your account for significant deviations or errors.</p>
+    <p>Your trading decisions are your own. They should reflect your personal investment needs, risk tolerance, and costs, and be validated independently. Always consult a SEBI-registered advisor before subscribing to or acting on any strategy. Neither HVK Trades nor any person or entity associated with it shall be held responsible for any loss or damage arising from the use of this information. Viewing or using this material constitutes acceptance of this disclaimer.</p>
+    <p>Daily P&amp;L reflects our live deployment logs on Tradetron. Actual execution results for individual subscribers may vary significantly due to market slippage, broker API latency, and transaction costs. Past data is not a guarantee of future returns.</p>
+  </div></section>
+  </div>
+
+  <div class="panel" id="tab-codes">
+    <section class="card" style="margin-top:0"><h2>TF series — shared codes</h2>
+      <p class="prose" style="margin:0 0 12px">Use these shared codes on Tradetron to add each part of the TF series. Tap <b>Copy</b> to copy a code.</p>
+      <div class="scroll"><table class="codes"><thead><tr><th>Strategy</th><th style="text-align:left">Shared code</th><th></th></tr></thead><tbody id="codeRows"></tbody></table></div>
+    </section>
+    <section class="card"><h2>Before you deploy</h2><div class="prose">
+      <ul>
+        <li>Expected drawdown: about 8–12% per part, 8–10% for the Part 1–4 combo — and it can go deeper.</li>
+        <li>Keep the TF series to no more than 10–15% of your total capital.</li>
+        <li>Each part is designed for ₹4L of deployed capital.</li>
+      </ul>
+      <p class="muted">Not investment advice. Please read the disclaimer on the Analytics tab before deploying.</p>
+    </div></section>
+  </div>
+
+  <div class="panel" id="tab-updates">
+    <section class="card" style="margin-top:0"><h2>Subscriber records — action needed</h2><div class="prose">
+      <p>Thank you for the faith you have placed in us. As our community has grown, we are updating our records: some Tradetron IDs and names on our list don't match the details we hold, which makes it hard to identify and support each subscriber properly.</p>
+      <p>Please fill this short form with your details — it takes less than 2 minutes.</p>
+      <a class="cta" href="https://forms.gle/dfCaqEeKRpftD9pE6" target="_blank" rel="noopener">Open the subscriber form</a>
+      <p class="muted" style="margin-top:12px">We continue only with subscribers whose details we have on record; IDs we can't identify are not carried forward. There is no change to our strategies or charges.</p>
+    </div></section>
+    <section class="card"><h2>Coming soon</h2><div class="prose">
+      <p>We will soon launch new <b>non-directional strategies</b> to complement the Trend-Following line and add more balance to the portfolio. Stay tuned!</p>
+    </div></section>
+    <section class="card"><h2>A humble note to our subscribers</h2><div class="prose">
+      <p>A sincere thank you for the trust you place in HVK Trades. That trust is exactly why we want to be fully transparent about what the TF series is — and what it is not — before you deploy it live.</p>
+      <p>We run these strategies in our own account too, and keep working to optimise them. That effort carries a real cost, which is why we share them by subscription. But making money from subscriptions is not our primary objective, and we will never do it by giving you false expectations. Our intent is simply to keep you informed, so that together we stay disciplined and consistent.</p>
+      <p>We understand there isn't a lot of live data yet. If the daily MTM behaviour and volatility suit your trading style, you are welcome to deploy. If you'd rather observe for a few more days first, that is perfectly fine — and often the wiser choice.</p>
+      <p>Trade with discipline, size with respect for risk, and reach out anytime you have questions.</p>
+      <p><b>— HVK Trades</b></p>
+    </div></section>
+  </div>
+
 </div>
 
 <script>
@@ -271,21 +352,25 @@ function render(data){
 
 let lastData=null;
 async function load(fresh){
-  const btn=document.getElementById("refresh"); btn.disabled=true;
   try{
     if(!seed) seed=await (await fetch("seed.json",{cache:"no-store"})).json();
     lastData=await api(fresh?"?refresh=1":"");
     render(lastData);
   }catch(e){ if(String(e.message)!=="password"){const b=document.getElementById("banner");b.style.display="block";b.textContent="Could not load: "+e.message; if(seed&&!lastData){lastData={days:[],intraday:[]};render(lastData)}} }
-  finally{btn.disabled=false; nextAt=Date.now()+REFRESH_MS}
+  finally{nextAt=Date.now()+REFRESH_MS}
 }
-document.getElementById("refresh").onclick=()=>load(true);
 const saveU=()=>{try{localStorage.setItem("hvk_units",JSON.stringify(U))}catch(e){}};
 function setMode(p,reset=true){GLOBAL=p;PCT=p;if(reset){U={};saveU()}try{localStorage.setItem("hvk_mode",p?"pct":"amt")}catch(e){};document.getElementById("mPct").className=p?"on":"";document.getElementById("mAmt").className=p?"":"on";if(lastData)render(lastData)}
 document.querySelectorAll("select.unit").forEach(el=>el.onchange=()=>{U[el.dataset.sec]=el.value==="pct";saveU();if(lastData)render(lastData)});
 document.getElementById("mAmt").onclick=()=>setMode(false); document.getElementById("mPct").onclick=()=>setMode(true); setMode(GLOBAL,false);
 setInterval(()=>{const s=Math.max(0,Math.round((nextAt-Date.now())/1000));document.getElementById("next").textContent=`Next refresh ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;if(nextAt&&Date.now()>=nextAt)load(true)},1000);
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>lastData&&render(lastData));
+const CODES=[["TF Part 1","ea917213-3c05-44ef-a432-c341a9c19838","--p1"],["TF Part 2","f5e5ef87-f4cf-4a55-ae05-a18a7c2c0c73","--p2"],["TF Part 3","7466e9c9-87c9-4489-aa77-6c0b25c489cd","--p3"],["TF Part 4","97561451-8605-447c-8cda-4cd43e702558","--p4"],["TF Part 5","65f060ed-456c-42fa-87f5-f65797842ecf","--p5"]];
+document.getElementById("codeRows").innerHTML=CODES.map(([n,c,v])=>`<tr><td style="color:var(${v});font-weight:600">${n}</td><td style="text-align:left"><span class="code">${c}</span></td><td><button class="copy" data-code="${c}">Copy</button></td></tr>`).join("");
+document.getElementById("codeRows").onclick=async e=>{const b=e.target.closest(".copy");if(!b)return;try{await navigator.clipboard.writeText(b.dataset.code)}catch(_){const t=document.createElement("textarea");t.value=b.dataset.code;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove()}b.textContent="Copied";b.classList.add("done");setTimeout(()=>{b.textContent="Copy";b.classList.remove("done")},1500)};
+function showTab(name){if(!document.getElementById("tab-"+name))name="analytics";document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===name));document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id==="tab-"+name));if(name==="analytics"&&lastData)render(lastData)}
+document.querySelector(".tabs").onclick=e=>{const b=e.target.closest("button[data-tab]");if(!b)return;history.replaceState(null,"","#"+b.dataset.tab);showTab(b.dataset.tab)};
+showTab(location.hash.slice(1)||"analytics");
 load(true);
 </script>
 </body>
