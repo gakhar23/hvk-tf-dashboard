@@ -119,7 +119,7 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
 <script>
 const STRATS=[["30168334","TF Part 1","--p1"],["30168338","TF Part 2","--p2"],["30168342","TF Part 3","--p3"],["30169714","TF Part 4","--p4"],["31353714","TF Part 5","--p5"]];
 const CAP=400000;
-let REFRESH_MS=15*60*1000; // becomes 1 min once LIVE_URL (below) is set
+let REFRESH_MS=60*1000; // live data: refresh every minute while the page is open
 const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const COLS=()=>[...STRATS.map(s=>css(s[2])),css("--pc")];
 const NAMES=[...STRATS.map(s=>s[1]),"Combined"];
@@ -141,40 +141,12 @@ const tipFor=p=>v=>p?sp(v):inr(v);
 let pass=null; try{pass=localStorage.getItem("hvk_pass")}catch(e){}
 let seed=null, charts={}, nextAt=0;
 
-// History comes from data/live.json (saved by GitHub Actions every 15 min).
-// Live numbers come from the Cloudflare Worker on every page open / refresh.
-// Paste your Worker URL here (leave "" to use only the saved file).
-const LIVE_URL="";
-if(LIVE_URL) REFRESH_MS=60*1000;
-async function liveNow(){
-  if(!LIVE_URL) return null;
-  try{
-    const r=await fetch(LIVE_URL+"?ts="+Date.now(),{cache:"no-store"});
-    const j=await r.json();
-    if(!r.ok||!j.ok) return {error:j.error||("live HTTP "+r.status)};
-    return j;
-  }catch(e){return {error:"live: "+e.message}}
-}
+// Data comes from this site's /api/data (Cloudflare Worker). The Tradetron key stays on Cloudflare.
 async function api(){
-  const [r,live]=await Promise.all([fetch("data/live.json?ts="+Date.now(),{cache:"no-store"}),liveNow()]);
-  if(!r.ok) throw new Error("data file HTTP "+r.status);
-  const j=await r.json();
-  const out={ok:true,latest:j.latest,lastCheck:j.lastCheck,intraday:j.latest?(j.intraday||[]):[],days:j.days||[],lastError:j.lastError,refreshError:null};
-  if(live&&live.error){out.refreshError=live.error;return out}
-  if(live){
-    out.lastCheck={at:live.at,date:live.date,time:live.time,status:live.status,statusError:live.statusError};
-    out.lastError=null;
-    const traded=STRATS.some(([id])=>live.pnl[id]!=null&&live.pnl[id]!==0);
-    if(traded){
-      const sameDay=out.latest&&out.latest.date===live.date;
-      const intra=sameDay?out.intraday.filter(p=>p.t<live.time):[];
-      intra.push({t:live.time,total:STRATS.reduce((a,[id])=>a+(live.pnl[id]||0),0)});
-      out.latest={date:live.date,time:live.time,at:live.at,pnl:live.pnl,status:live.status};
-      out.intraday=intra;
-      out.days=out.days.filter(d=>d.date!==live.date).concat([{date:live.date,pnl:live.pnl,final_at:live.time}]);
-    }
-  }
-  return out;
+  const r=await fetch("api/data?ts="+Date.now(),{cache:"no-store"});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||!j.ok) throw new Error(j.error||("HTTP "+r.status));
+  return j;
 }
 function showGate(){document.getElementById("app").style.display="none";document.getElementById("gate").style.display="block"}
 document.getElementById("go").onclick=()=>{pass=document.getElementById("pw").value;try{localStorage.setItem("hvk_pass",pass)}catch(e){};document.getElementById("gate").style.display="none";document.getElementById("app").style.display="block";load(true)};

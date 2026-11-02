@@ -1,0 +1,10 @@
+.git
+.github
+data
+scripts
+worker
+tf-worker.js
+wrangler.jsonc
+README.md
+node_modules
+.wrangler

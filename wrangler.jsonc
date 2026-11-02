@@ -1,0 +1,12 @@
+{
+  // Cloudflare Worker for the HVK TF dashboard (page + live API + 15-min saves)
+  "name": "hvk-tf-dashboard",
+  "main": "tf-worker.js",
+  "compatibility_date": "2026-06-01",
+  "assets": { "directory": "./", "binding": "ASSETS" },
+  "kv_namespaces": [{ "binding": "TF", "id": "b44c5044e75242dabeede7035df7b266" }],
+  // every 15 min, Mon–Fri, 08:30–16:15 IST (Cloudflare crons are UTC)
+  "triggers": { "crons": ["*/15 3-10 * * 1-5"] },
+  "observability": { "enabled": true }
+  // Secret (set in Cloudflare, never here): TT_API_KEY
+}
