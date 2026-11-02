@@ -211,7 +211,7 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
 <script>
 const STRATS=[["30168334","TF Part 1","--p1"],["30168338","TF Part 2","--p2"],["30168342","TF Part 3","--p3"],["30169714","TF Part 4","--p4"],["31353714","TF Part 5","--p5"]];
 const CAP=400000;
-let REFRESH_MS=60*1000; // live data: refresh every minute while the page is open
+let REFRESH_MS=5*60*1000; // live data: refresh every 5 minutes while the page is open
 const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const COLS=()=>[...STRATS.map(s=>css(s[2])),css("--pc")];
 const NAMES=[...STRATS.map(s=>s[1]),"Combined"];
