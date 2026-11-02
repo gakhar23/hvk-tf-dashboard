@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>HVK TF Dashboard</title>
+<title>HVK Trades · Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -90,21 +90,22 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
 .copy{padding:5px 10px;font-size:12px}
 .copy.done{color:var(--pos);border-color:var(--pos)}
 .cta{display:inline-block;margin-top:4px;padding:8px 14px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+.brand{display:flex;align-items:center;gap:12px;justify-content:flex-start;margin-bottom:6px}
+.logo{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--accent),#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px Inter,sans-serif;letter-spacing:.04em;flex:none}
+.brand h1{font-size:22px}
+.tag{font-size:13px;color:var(--muted)}
+.dhead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.dtitle{font-size:20px;margin:0;letter-spacing:-.01em}
+.dsub{font-size:13px;color:var(--muted);margin-top:2px}
 #banner{display:none;margin-bottom:12px;padding:10px 12px;border-radius:10px;background:var(--neg-bg);color:var(--neg);font-size:13px}
 </style>
 </head>
 <body>
 <div id="gate" class="card"><h1>HVK TF Dashboard</h1><input id="pw" type="password" placeholder="Password" autocomplete="current-password"><button id="go">Open</button></div>
 <div class="wrap" id="app">
-  <header>
-    <h1>HVK Trades · TF Part 1–5<small>Trend-Following series · live P&amp;L</small></h1>
-    <div class="meta">
-      <span class="pill" id="mkt">—</span>
-      <span class="pill" id="upd">Loading…</span>
-      <span class="pill" id="chk">—</span>
-      <span class="pill" id="next">—</span>
-      <span class="seg" role="group" aria-label="Show values as"><button id="mAmt">₹</button><button id="mPct">%</button></span>
-    </div>
+  <header class="brand">
+    <div class="logo">HVK</div>
+    <div><h1>HVK Trades</h1><div class="tag">Algorithmic trading strategies on Tradetron</div></div>
   </header>
   <div id="banner"></div>
   <nav class="tabs" role="tablist">
@@ -114,6 +115,16 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
   </nav>
 
   <div class="panel on" id="tab-analytics">
+  <div class="dhead">
+    <div><h2 class="dtitle">Analytics Dashboard</h2><div class="dsub">TF Part 1–5 · Trend-Following series · live P&amp;L</div></div>
+    <div class="meta">
+      <span class="pill" id="mkt">—</span>
+      <span class="pill" id="upd">Loading…</span>
+      <span class="pill" id="chk">—</span>
+      <span class="pill" id="next">—</span>
+      <span class="seg" role="group" aria-label="Show values as"><button id="mAmt">₹</button><button id="mPct">%</button></span>
+    </div>
+  </div>
 
   <div class="grid tiles" id="tiles"></div>
 
@@ -143,12 +154,12 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
     <p>The TF series is primarily a <b>directional (trend-following)</b> strategy series, with a minor non-directional stance built in. Please keep this character in mind when you judge its behaviour across different market conditions.</p>
     <p>We run these strategies live in our own personal account as well, and keep working to optimise them further.</p>
     <h3>Expected drawdowns</h3>
-    <div class="ddgrid"><div>Individual part<b>8–12%</b></div><div>Part 1–4 combo<b>8–10%</b></div><div>Suggested allocation<b>≤ 10–15%</b><span class="muted">of your total capital</span></div></div>
+    <div class="ddgrid"><div>Individual part<b>8–12%</b></div><div>Part 1–5 combo<b>8–10%</b></div><div>Suggested allocation<b>≤ 10–15%</b><span class="muted">of your total capital</span></div></div>
     <p>These figures come from our past data analysis. They are indicative, not a ceiling: in adverse or unusual markets the actual drawdown can go deeper. Treat them as normal, expected behaviour for this style of strategy, and deploy only once you are comfortable with a larger drawdown in a worst case. Size your deployment strictly to your own risk appetite.</p>
     <h3>Running at your own discretion</h3>
     <p>If on a particular day you feel the strategy may not suit you, you are free to pause or adjust. Your returns may then differ from full everyday live deployment, and your drawdown may be more or less than ours.</p>
     <h3>Backtests</h3>
-    <p>Each part is itself a blend of several strategies, so we don't share per-part backtests: that would expose the underlying logic and erode the edge for every subscriber. The combined Part 1–4 portfolio also cannot be backtested on Tradetron because of platform limits. If you'd like more evidence, watching the live daily P&amp;L here for a while before deploying is often the wiser choice.</p>
+    <p>Each part is itself a blend of several strategies, so we don't share per-part backtests: that would expose the underlying logic and erode the edge for every subscriber. The combined Part 1–5 portfolio also cannot be backtested on Tradetron because of platform limits. If you'd like more evidence, watching the live daily P&amp;L here for a while before deploying is often the wiser choice.</p>
     <p class="muted">Percentages on this page are of deployed capital: ₹4L per part, ₹20L for all five parts combined. Daily P&amp;L reflects our live deployment on Tradetron; your results may vary with slippage, broker API latency and costs.</p>
   </div></section>
 
@@ -168,7 +179,7 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
     </section>
     <section class="card"><h2>Before you deploy</h2><div class="prose">
       <ul>
-        <li>Expected drawdown: about 8–12% per part, 8–10% for the Part 1–4 combo — and it can go deeper.</li>
+        <li>Expected drawdown: about 8–12% per part, 8–10% for the Part 1–5 combo — and it can go deeper.</li>
         <li>Keep the TF series to no more than 10–15% of your total capital.</li>
         <li>Each part is designed for ₹4L of deployed capital.</li>
       </ul>
