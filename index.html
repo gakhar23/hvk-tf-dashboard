@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>HVK Trades · Dashboard</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -107,7 +109,7 @@ a.lbtn:hover{border-color:var(--accent)}
 .tt button{border:0;border-radius:0;background:none;color:var(--muted);padding:6px 12px;font-size:13px;display:flex;align-items:center;gap:6px}
 .tt button.on{background:var(--accent);color:#fff}
 @media (max-width:480px){.tt button span{display:none}}
-.logo{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--accent),#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px Inter,sans-serif;letter-spacing:.04em;flex:none}
+.logo{width:48px;height:48px;border-radius:12px;flex:none;display:block;object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,.18)}
 .brand h1{font-size:22px}
 .tag{font-size:13px;color:var(--muted)}
 .dhead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
@@ -121,6 +123,19 @@ table.corr tbody th{font-size:12px;font-weight:600;text-align:right;padding-righ
 table.corr{width:100%}
 table.corr td{height:46px;min-width:54px;border-radius:8px;font:600 13px "JetBrains Mono",monospace}
 table.corr td.diag{background:var(--soft);color:var(--muted)}
+.contacts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.contacts{grid-template-columns:1fr}}
+.ct{display:flex;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--soft);color:var(--ink);text-decoration:none}
+.ct:hover{border-color:var(--accent)}
+.ct>span:nth-child(2){flex:1;min-width:0}
+.ct .ic{width:38px;height:38px;border-radius:10px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--accent);flex:none}
+.ct b{display:block}.ct small{display:block;color:var(--muted);font-size:12px;line-height:1.4}
+.ct .ph{color:var(--neg)}
+.ct .go{font-size:12px;font-weight:600;color:var(--accent);border:1px solid var(--line);border-radius:999px;padding:4px 10px;background:var(--card);flex:none}
+.upd{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--line)}.upd:last-child{border-bottom:0}
+.upd p{margin:0}
+.tagc{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--soft);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.tagc.new{background:var(--pos-bg);color:var(--pos);border-color:transparent}
 #banner{display:none;margin-bottom:12px;padding:10px 12px;border-radius:10px;background:var(--neg-bg);color:var(--neg);font-size:13px}
 </style>
 </head>
@@ -128,7 +143,7 @@ table.corr td.diag{background:var(--soft);color:var(--muted)}
 <div id="gate" class="card"><h1>HVK TF Dashboard</h1><input id="pw" type="password" placeholder="Password" autocomplete="current-password"><button id="go">Open</button></div>
 <div class="wrap" id="app">
   <header class="brand">
-    <div class="logo">HVK</div>
+    <img class="logo" src="logo.png" alt="HVK Trades logo" width="48" height="48">
     <div><h1>HVK Trades</h1><div class="tag">Algorithmic trading strategies on Tradetron</div></div>
     <div class="tt" role="group" aria-label="Theme"><button data-theme-set="light" title="Light theme">☀<span>Light</span></button><button data-theme-set="dark" title="Dark theme">☾<span>Dark</span></button></div>
   </header>
@@ -137,7 +152,7 @@ table.corr td.diag{background:var(--soft);color:var(--muted)}
     <button data-tab="analytics" class="on">Analytics</button>
     <button data-tab="codes">Strategy Codes</button>
     <button data-tab="links">Strategy Links</button>
-    <button data-tab="updates">Updates</button>
+    <button data-tab="updates">Connect &amp; Updates</button>
   </nav>
 
   <div class="panel on" id="tab-analytics">
@@ -235,15 +250,37 @@ table.corr td.diag{background:var(--soft);color:var(--muted)}
   </div>
 
   <div class="panel" id="tab-updates">
-    <section class="card" style="margin-top:0"><h2>Subscriber records — action needed</h2><div class="prose">
-      <p>Thank you for the faith you have placed in us. As our community has grown, we are updating our records: some Tradetron IDs and names on our list don't match the details we hold, which makes it hard to identify and support each subscriber properly.</p>
-      <p>Please fill this short form with your details — it takes less than 2 minutes.</p>
-      <a class="cta" href="https://forms.gle/dfCaqEeKRpftD9pE6" target="_blank" rel="noopener">Open the subscriber form</a>
-      <p class="muted" style="margin-top:12px">We continue only with subscribers whose details we have on record; IDs we can't identify are not carried forward. There is no change to our strategies or charges.</p>
+    <section class="card" style="margin-top:0"><h2>Connect with HVK Trades</h2><div class="prose" style="max-width:none">
+      <p style="margin-bottom:12px">Join the community, ask a question, or follow along — pick whichever suits you.</p>
+      <div class="contacts">
+        <a class="ct" href="https://t.me/hvktrades" target="_blank" rel="noopener"><span class="ic">➤</span><span><b>Telegram group</b><small class="what">Daily P&amp;L updates, announcements and community chat</small><small>t.me/hvktrades</small></span><span class="go">Join</span></a>
+        <a class="ct" href="https://t.me/hvktd" target="_blank" rel="noopener"><span class="ic">✉</span><span><b>Personal Telegram</b><small class="what">One-to-one queries about deployment or your subscription</small><small>@hvktd</small></span><span class="go">Message</span></a>
+        <a class="ct" href="https://www.instagram.com/hvk_trades/" target="_blank" rel="noopener"><span class="ic">◎</span><span><b>Instagram</b><small class="what">Short videos on trading concepts and market behaviour</small><small>@hvk_trades</small></span><span class="go">Follow</span></a>
+        <a class="ct" href="mailto:hvktrades@gmail.com"><span class="ic">@</span><span><b>Email</b><small class="what">Formal queries, records and billing</small><small>hvktrades@gmail.com</small></span><span class="go">Write</span></a>
+      </div>
     </div></section>
-    <section class="card"><h2>Coming soon</h2><div class="prose">
-      <p>We will soon launch new <b>non-directional strategies</b> to complement the Trend-Following line and add more balance to the portfolio. Stay tuned!</p>
+
+    <section class="grid two">
+      <div class="card"><h2>Subscriber records form</h2><div class="prose">
+        <p>To identify and support every subscriber properly, please keep your Tradetron ID and details on record with us. It takes less than 2 minutes.</p>
+        <a class="cta" href="https://forms.gle/dfCaqEeKRpftD9pE6" target="_blank" rel="noopener">Open the subscriber form</a>
+        <p class="muted" style="margin-top:12px">We continue only with subscribers whose details we have on record. There is no change to our strategies or charges.</p>
+      </div></div>
+      <div class="card"><h2>Before you contact us</h2><div class="prose">
+        <ul>
+          <li>Mention your <b>Tradetron ID</b> and the part(s) you've deployed.</li>
+          <li>For an order or execution issue, add the date, time and a screenshot from Tradetron.</li>
+          <li>Check the Telegram group first — common questions are often answered there.</li>
+          <li>We can't give personal investment advice; please consult a SEBI-registered advisor for that.</li>
+        </ul>
+      </div></div>
+    </section>
+
+    <section class="card"><h2>Latest updates</h2><div class="prose" style="max-width:none">
+      <div class="upd"><span class="tagc">Coming soon</span><p>New <b>non-directional strategies</b> to complement the Trend-Following line and add more balance to the portfolio. Stay tuned!</p></div>
+      <div class="upd"><span class="tagc new">New</span><p>This live dashboard: daily P&amp;L, equity curves, correlation matrix, strategy codes and links, all in one place.</p></div>
     </div></section>
+
     <section class="card"><h2>A humble note to our subscribers</h2><div class="prose">
       <p>A sincere thank you for the trust you place in HVK Trades. That trust is exactly why we want to be fully transparent about what the TF series is — and what it is not — before you deploy it live.</p>
       <p>We run these strategies in our own account too, and keep working to optimise them. That effort carries a real cost, which is why we share them by subscription. But making money from subscriptions is not our primary objective, and we will never do it by giving you false expectations. Our intent is simply to keep you informed, so that together we stay disciplined and consistent.</p>
