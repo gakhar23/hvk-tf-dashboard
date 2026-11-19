@@ -8,16 +8,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>try{const t=localStorage.getItem("hvk_theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
 <style>
 :root{
   --bg:#F4F6FA;--card:#FFFFFF;--ink:#0F172A;--muted:#64748B;--line:#E2E8F0;--soft:#F1F5F9;
   --pos:#15803D;--pos-bg:#DCFCE7;--neg:#B91C1C;--neg-bg:#FEE2E2;--accent:#2563EB;
   --p1:#2563EB;--p2:#F97316;--p3:#16A34A;--p4:#9333EA;--p5:#DB2777;--pc:#0F172A;
 }
-@media (prefers-color-scheme:dark){:root{
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0B1120;--card:#111827;--ink:#E5E7EB;--muted:#94A3B8;--line:#1F2937;--soft:#0F172A;
   --pos:#4ADE80;--pos-bg:#052E16;--neg:#F87171;--neg-bg:#450A0A;--accent:#60A5FA;--pc:#F8FAFC;
+  color-scheme:dark;
 }}
+:root[data-theme="dark"]{
+  --bg:#0B1120;--card:#111827;--ink:#E5E7EB;--muted:#94A3B8;--line:#1F2937;--soft:#0F172A;
+  --pos:#4ADE80;--pos-bg:#052E16;--neg:#F87171;--neg-bg:#450A0A;--accent:#60A5FA;--pc:#F8FAFC;
+  color-scheme:dark;
+}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,sans-serif}
 .wrap{max-width:1280px;margin:0 auto;padding:16px}
@@ -65,7 +72,7 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
 .seg button{border:0;border-radius:0;padding:7px 12px;background:var(--card);color:var(--muted)}
 .seg button.on{background:var(--accent);color:#fff}
 .tile .alt{font-size:12px;font-weight:600;font-family:"JetBrains Mono",monospace}
-.unit{font-size:12px;padding:4px 6px}
+.unit,.win{font-size:12px;padding:4px 6px}
 .ctl{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .card .row h2{margin:0}
 .card>.row{margin-bottom:10px}
@@ -91,12 +98,35 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
 .copy.done{color:var(--pos);border-color:var(--pos)}
 .cta{display:inline-block;margin-top:4px;padding:8px 14px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
 .brand{display:flex;align-items:center;gap:12px;justify-content:flex-start;margin-bottom:6px}
+.brand .tt{margin-left:auto;flex:none}
+.brand>div:nth-child(2){flex:1;min-width:0}
+.tt{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
+.tt button{border:0;border-radius:0;background:none;color:var(--muted);padding:6px 12px;font-size:13px;display:flex;align-items:center;gap:6px}
+.tt button.on{background:var(--accent);color:#fff}
+@media (max-width:480px){.tt button span{display:none}}
 .logo{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--accent),#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px Inter,sans-serif;letter-spacing:.04em;flex:none}
 .brand h1{font-size:22px}
 .tag{font-size:13px;color:var(--muted)}
 .dhead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
 .dtitle{font-size:20px;margin:0;letter-spacing:-.01em}
 .dsub{font-size:13px;color:var(--muted);margin-top:2px}
+.corrWrap{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:860px){.corrWrap{grid-template-columns:1fr}}
+table.corr{border-collapse:separate;border-spacing:4px;font-variant-numeric:tabular-nums}
+table.corr th,table.corr td{border:0;padding:0;text-align:center;white-space:nowrap}
+table.corr thead th{font-size:12px;font-weight:600;padding-bottom:2px}
+table.corr tbody th{font-size:12px;font-weight:600;text-align:right;padding-right:6px}
+table.corr td{height:46px;min-width:54px;border-radius:8px;font:600 13px "JetBrains Mono",monospace}
+table.corr td.diag{background:var(--soft);color:var(--muted)}
+.corrSide{display:flex;flex-direction:column;gap:10px}
+.cstat{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.cstat span{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.cstat b{font:600 16px "JetBrains Mono",monospace}
+.cstat small{display:block;font-size:12px;color:var(--muted)}
+.legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.legend i{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(220,38,38,.85),rgba(220,38,38,.08))}
+.legend i.p{background:linear-gradient(90deg,rgba(37,99,235,.08),rgba(37,99,235,.85))}
+.corrNote{font-size:12px;color:var(--muted);margin:0}
 #banner{display:none;margin-bottom:12px;padding:10px 12px;border-radius:10px;background:var(--neg-bg);color:var(--neg);font-size:13px}
 </style>
 </head>
@@ -106,6 +136,7 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
   <header class="brand">
     <div class="logo">HVK</div>
     <div><h1>HVK Trades</h1><div class="tag">Algorithmic trading strategies on Tradetron</div></div>
+    <div class="tt" role="group" aria-label="Theme"><button data-theme-set="light" title="Light theme">☀<span>Light</span></button><button data-theme-set="dark" title="Dark theme">☾<span>Dark</span></button></div>
   </header>
   <div id="banner"></div>
   <nav class="tabs" role="tablist">
@@ -134,6 +165,20 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
   </section>
 
   <section class="card"><div class="row"><h2>Equity curves — cumulative P&amp;L</h2><select class="unit" data-sec="eq" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="chartbox"><canvas id="cEq"></canvas></div></section>
+
+  <section class="card">
+    <div class="row"><h2>Correlation matrix — TF Part 1–5</h2><select id="corrWin" class="win" aria-label="Period"><option value="0">All history</option><option value="60">Last 60 days</option><option value="20">Last 20 days</option></select></div>
+    <div class="corrWrap">
+      <div class="scroll"><table class="corr" id="corr"></table></div>
+      <div class="corrSide">
+        <div class="cstat"><span>Average pairwise correlation</span><b id="cAvg">—</b><small id="cAvgS"></small></div>
+        <div class="cstat"><span>Most correlated pair</span><b id="cHi">—</b></div>
+        <div class="cstat"><span>Least correlated pair</span><b id="cLo">—</b></div>
+        <div class="legend"><span>−1</span><i></i><span>0</span><i class="p"></i><span>+1</span></div>
+        <p class="corrNote">Correlation of daily P&amp;L between parts (−1 to +1), over <span id="cN">—</span> trading days. Values near +1 mean two parts tend to win and lose on the same days; values near 0 or below mean they move independently, which smooths the combined equity curve.</p>
+      </div>
+    </div>
+  </section>
 
   <section class="grid two">
     <div class="card"><div class="row"><h2>Combined drawdown from peak</h2><select class="unit" data-sec="dd" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="chartbox sm"><canvas id="cDD"></canvas></div></div>
@@ -359,6 +404,39 @@ function render(data){
   }
   document.getElementById("cal").innerHTML=html;
   PCT=GLOBAL;
+  renderCorr(S,labels);
+}
+function pearson(a,b){
+  const x=[],y=[]; for(let i=0;i<a.length;i++) if(a[i]!=null&&b[i]!=null){x.push(+a[i]);y.push(+b[i])}
+  const n=x.length; if(n<3) return {r:null,n};
+  const mx=x.reduce((p,q)=>p+q,0)/n,my=y.reduce((p,q)=>p+q,0)/n;
+  let sxy=0,sx=0,sy=0; for(let i=0;i<n;i++){const dx=x[i]-mx,dy=y[i]-my;sxy+=dx*dy;sx+=dx*dx;sy+=dy*dy}
+  return {r:sx&&sy?sxy/Math.sqrt(sx*sy):null,n};
+}
+function renderCorr(S,labels){
+  const win=+document.getElementById("corrWin").value;
+  // only days where at least one part traded
+  let idx=labels.map((_,i)=>i).filter(i=>S.slice(0,5).some(x=>x[i]!=null&&x[i]!==0));
+  if(win) idx=idx.slice(-win);
+  const P=S.slice(0,5).map(x=>idx.map(i=>x[i]));
+  const short=n=>n.replace("TF Part ","P");
+  const C=STRATS.map(([id,nm,v])=>css(v));
+  const M=P.map(a=>P.map(b=>pearson(a,b)));
+  const bg=r=>r==null?css("--soft"):r>=0?`rgba(37,99,235,${(.08+.77*Math.min(1,r)).toFixed(3)})`:`rgba(220,38,38,${(.08+.77*Math.min(1,-r)).toFixed(3)})`;
+  const fg=r=>r!=null&&Math.abs(r)>.55?"#fff":"inherit";
+  document.getElementById("corr").innerHTML=`<thead><tr><th></th>${NAMES.slice(0,5).map((n,k)=>`<th style="color:${C[k]}">${short(n)}</th>`).join("")}</tr></thead><tbody>${M.map((row,i)=>`<tr><th style="color:${C[i]}">${short(NAMES[i])}</th>${row.map((c,j)=>i===j?`<td class="diag">1.00</td>`:`<td style="background:${bg(c.r)};color:${fg(c.r)}" title="${NAMES[i]} vs ${NAMES[j]}: ${c.r==null?"not enough data":c.r.toFixed(2)} over ${c.n} days">${c.r==null?"—":c.r.toFixed(2)}</td>`).join("")}</tr>`).join("")}</tbody>`;
+  const pairs=[]; for(let i=0;i<5;i++)for(let j=i+1;j<5;j++) if(M[i][j].r!=null) pairs.push({i,j,r:M[i][j].r});
+  const f=r=>(r>0?"+":"")+r.toFixed(2);
+  if(pairs.length){
+    const avg=pairs.reduce((a,p)=>a+p.r,0)/pairs.length;
+    pairs.sort((a,b)=>b.r-a.r);
+    const hi=pairs[0],lo=pairs[pairs.length-1];
+    document.getElementById("cAvg").textContent=f(avg);
+    document.getElementById("cAvgS").textContent=avg<0.3?"Low — good diversification":avg<0.6?"Moderate":"High — parts often move together";
+    document.getElementById("cHi").textContent=`${short(NAMES[hi.i])} & ${short(NAMES[hi.j])}  ${f(hi.r)}`;
+    document.getElementById("cLo").textContent=`${short(NAMES[lo.i])} & ${short(NAMES[lo.j])}  ${f(lo.r)}`;
+  }
+  document.getElementById("cN").textContent=idx.length;
 }
 
 let lastData=null;
@@ -370,12 +448,18 @@ async function load(fresh){
   }catch(e){ if(String(e.message)!=="password"){const b=document.getElementById("banner");b.style.display="block";b.textContent="Could not load: "+e.message; if(seed&&!lastData){lastData={days:[],intraday:[]};render(lastData)}} }
   finally{nextAt=Date.now()+REFRESH_MS}
 }
+document.getElementById("corrWin").onchange=()=>lastData&&render(lastData);
 const saveU=()=>{try{localStorage.setItem("hvk_units",JSON.stringify(U))}catch(e){}};
 function setMode(p,reset=true){GLOBAL=p;PCT=p;if(reset){U={};saveU()}try{localStorage.setItem("hvk_mode",p?"pct":"amt")}catch(e){};document.getElementById("mPct").className=p?"on":"";document.getElementById("mAmt").className=p?"":"on";if(lastData)render(lastData)}
 document.querySelectorAll("select.unit").forEach(el=>el.onchange=()=>{U[el.dataset.sec]=el.value==="pct";saveU();if(lastData)render(lastData)});
 document.getElementById("mAmt").onclick=()=>setMode(false); document.getElementById("mPct").onclick=()=>setMode(true); setMode(GLOBAL,false);
 setInterval(()=>{const s=Math.max(0,Math.round((nextAt-Date.now())/1000));document.getElementById("next").textContent=`Next refresh ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;if(nextAt&&Date.now()>=nextAt)load(true)},1000);
-matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>lastData&&render(lastData));
+const darkMQ=matchMedia("(prefers-color-scheme: dark)");
+function curTheme(){const t=document.documentElement.dataset.theme;return t||(darkMQ.matches?"dark":"light")}
+function markTheme(){document.querySelectorAll("[data-theme-set]").forEach(b=>b.classList.toggle("on",b.dataset.themeSet===curTheme()))}
+document.querySelectorAll("[data-theme-set]").forEach(b=>b.onclick=()=>{document.documentElement.dataset.theme=b.dataset.themeSet;try{localStorage.setItem("hvk_theme",b.dataset.themeSet)}catch(e){}markTheme();if(lastData)render(lastData)});
+markTheme();
+darkMQ.addEventListener("change",()=>{markTheme();if(lastData)render(lastData)});
 const CODES=[["TF Part 1","ea917213-3c05-44ef-a432-c341a9c19838","--p1"],["TF Part 2","f5e5ef87-f4cf-4a55-ae05-a18a7c2c0c73","--p2"],["TF Part 3","7466e9c9-87c9-4489-aa77-6c0b25c489cd","--p3"],["TF Part 4","97561451-8605-447c-8cda-4cd43e702558","--p4"],["TF Part 5","65f060ed-456c-42fa-87f5-f65797842ecf","--p5"]];
 document.getElementById("codeRows").innerHTML=CODES.map(([n,c,v])=>`<tr><td style="color:var(${v});font-weight:600">${n}</td><td style="text-align:left"><span class="code">${c}</span></td><td><button class="copy" data-code="${c}">Copy</button></td></tr>`).join("");
 document.getElementById("codeRows").onclick=async e=>{const b=e.target.closest(".copy");if(!b)return;try{await navigator.clipboard.writeText(b.dataset.code)}catch(_){const t=document.createElement("textarea");t.value=b.dataset.code;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove()}b.textContent="Copied";b.classList.add("done");setTimeout(()=>{b.textContent="Copy";b.classList.remove("done")},1500)};
