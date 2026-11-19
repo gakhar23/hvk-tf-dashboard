@@ -95,6 +95,9 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
 .codes td{white-space:normal}
 .code{font:500 13px "JetBrains Mono",monospace;word-break:break-all;background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:4px 8px;display:inline-block}
 .copy{padding:5px 10px;font-size:12px}
+a.code{color:var(--accent);text-decoration:none}a.code:hover{text-decoration:underline}
+a.lbtn{display:inline-block;font-weight:600;border:1px solid var(--line);border-radius:8px;color:var(--ink);text-decoration:none;background:var(--card)}
+a.lbtn:hover{border-color:var(--accent)}
 .copy.done{color:var(--pos);border-color:var(--pos)}
 .cta{display:inline-block;margin-top:4px;padding:8px 14px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
 .brand{display:flex;align-items:center;gap:12px;justify-content:flex-start;margin-bottom:6px}
@@ -110,23 +113,14 @@ select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--lin
 .dhead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
 .dtitle{font-size:20px;margin:0;letter-spacing:-.01em}
 .dsub{font-size:13px;color:var(--muted);margin-top:2px}
-.corrWrap{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;align-items:start}
-@media (max-width:860px){.corrWrap{grid-template-columns:1fr}}
+.corrWrap{width:100%}
 table.corr{border-collapse:separate;border-spacing:4px;font-variant-numeric:tabular-nums}
 table.corr th,table.corr td{border:0;padding:0;text-align:center;white-space:nowrap}
 table.corr thead th{font-size:12px;font-weight:600;padding-bottom:2px}
 table.corr tbody th{font-size:12px;font-weight:600;text-align:right;padding-right:6px}
+table.corr{width:100%}
 table.corr td{height:46px;min-width:54px;border-radius:8px;font:600 13px "JetBrains Mono",monospace}
 table.corr td.diag{background:var(--soft);color:var(--muted)}
-.corrSide{display:flex;flex-direction:column;gap:10px}
-.cstat{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
-.cstat span{display:block;font-size:12px;color:var(--muted);font-weight:600}
-.cstat b{font:600 16px "JetBrains Mono",monospace}
-.cstat small{display:block;font-size:12px;color:var(--muted)}
-.legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
-.legend i{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(220,38,38,.85),rgba(220,38,38,.08))}
-.legend i.p{background:linear-gradient(90deg,rgba(37,99,235,.08),rgba(37,99,235,.85))}
-.corrNote{font-size:12px;color:var(--muted);margin:0}
 #banner{display:none;margin-bottom:12px;padding:10px 12px;border-radius:10px;background:var(--neg-bg);color:var(--neg);font-size:13px}
 </style>
 </head>
@@ -142,6 +136,7 @@ table.corr td.diag{background:var(--soft);color:var(--muted)}
   <nav class="tabs" role="tablist">
     <button data-tab="analytics" class="on">Analytics</button>
     <button data-tab="codes">Strategy Codes</button>
+    <button data-tab="links">Strategy Links</button>
     <button data-tab="updates">Updates</button>
   </nav>
 
@@ -166,20 +161,6 @@ table.corr td.diag{background:var(--soft);color:var(--muted)}
 
   <section class="card"><div class="row"><h2>Equity curves — cumulative P&amp;L</h2><select class="unit" data-sec="eq" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="chartbox"><canvas id="cEq"></canvas></div></section>
 
-  <section class="card">
-    <div class="row"><h2>Correlation matrix — TF Part 1–5</h2><select id="corrWin" class="win" aria-label="Period"><option value="0">All history</option><option value="60">Last 60 days</option><option value="20">Last 20 days</option></select></div>
-    <div class="corrWrap">
-      <div class="scroll"><table class="corr" id="corr"></table></div>
-      <div class="corrSide">
-        <div class="cstat"><span>Average pairwise correlation</span><b id="cAvg">—</b><small id="cAvgS"></small></div>
-        <div class="cstat"><span>Most correlated pair</span><b id="cHi">—</b></div>
-        <div class="cstat"><span>Least correlated pair</span><b id="cLo">—</b></div>
-        <div class="legend"><span>−1</span><i></i><span>0</span><i class="p"></i><span>+1</span></div>
-        <p class="corrNote">Correlation of daily P&amp;L between parts (−1 to +1), over <span id="cN">—</span> trading days. Values near +1 mean two parts tend to win and lose on the same days; values near 0 or below mean they move independently, which smooths the combined equity curve.</p>
-      </div>
-    </div>
-  </section>
-
   <section class="grid two">
     <div class="card"><div class="row"><h2>Combined drawdown from peak</h2><select class="unit" data-sec="dd" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="chartbox sm"><canvas id="cDD"></canvas></div></div>
     <div class="card"><div class="row"><h2>Combined daily P&amp;L</h2><select class="unit" data-sec="daily" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></div><div class="chartbox sm"><canvas id="cDaily"></canvas></div></div>
@@ -193,6 +174,12 @@ table.corr td.diag{background:var(--soft);color:var(--muted)}
   <section class="card">
     <div class="row"><h2>Daily calendar</h2><span class="ctl"><select id="calSel" aria-label="Strategy"></select><select class="unit" data-sec="cal" aria-label="Show as"><option value="amt">₹ Amount</option><option value="pct">% of capital</option></select></span></div>
     <div class="scroll"><div class="cal" id="cal"></div></div>
+  </section>
+  <section class="card">
+    <div class="row"><h2>Correlation matrix — TF Part 1–5</h2><select id="corrWin" class="win" aria-label="Period"><option value="0">All history</option><option value="60">Last 60 days</option><option value="20">Last 20 days</option></select></div>
+    <div class="corrWrap">
+      <div class="scroll"><table class="corr" id="corr"></table></div>
+    </div>
   </section>
 
   <section class="card"><h2>About the TF series</h2><div class="prose">
@@ -221,6 +208,21 @@ table.corr td.diag{background:var(--soft);color:var(--muted)}
     <section class="card" style="margin-top:0"><h2>TF series — shared codes</h2>
       <p class="prose" style="margin:0 0 12px">Use these shared codes on Tradetron to add each part of the TF series. Tap <b>Copy</b> to copy a code.</p>
       <div class="scroll"><table class="codes"><thead><tr><th>Strategy</th><th style="text-align:left">Shared code</th><th></th></tr></thead><tbody id="codeRows"></tbody></table></div>
+    </section>
+    <section class="card"><h2>Before you deploy</h2><div class="prose">
+      <ul>
+        <li>Expected drawdown: about 8–12% per part, 8–10% for the Part 1–5 combo — and it can go deeper.</li>
+        <li>Keep the TF series to no more than 10–15% of your total capital.</li>
+        <li>Each part is designed for ₹4L of deployed capital.</li>
+      </ul>
+      <p class="muted">Not investment advice. Please read the disclaimer on the Analytics tab before deploying.</p>
+    </div></section>
+  </div>
+
+  <div class="panel" id="tab-links">
+    <section class="card" style="margin-top:0"><h2>TF series — strategy links</h2>
+      <p class="prose" style="margin:0 0 12px">Open each part's page on Tradetron to view and subscribe to it. Tap <b>Open</b> to go to the strategy.</p>
+      <div class="scroll"><table class="codes"><thead><tr><th>Strategy</th><th style="text-align:left">Tradetron link</th><th></th></tr></thead><tbody><tr><td style="color:var(--p1);font-weight:600">TF Part 1</td><td style="text-align:left"><a class="code" href="https://tradetron.tech/strategy/9932966" target="_blank" rel="noopener">tradetron.tech/strategy/9932966</a></td><td><a class="copy lbtn" href="https://tradetron.tech/strategy/9932966" target="_blank" rel="noopener">Open</a></td></tr><tr><td style="color:var(--p2);font-weight:600">TF Part 2</td><td style="text-align:left"><a class="code" href="https://tradetron.tech/strategy/9930678" target="_blank" rel="noopener">tradetron.tech/strategy/9930678</a></td><td><a class="copy lbtn" href="https://tradetron.tech/strategy/9930678" target="_blank" rel="noopener">Open</a></td></tr><tr><td style="color:var(--p3);font-weight:600">TF Part 3</td><td style="text-align:left"><a class="code" href="https://tradetron.tech/strategy/9930702" target="_blank" rel="noopener">tradetron.tech/strategy/9930702</a></td><td><a class="copy lbtn" href="https://tradetron.tech/strategy/9930702" target="_blank" rel="noopener">Open</a></td></tr><tr><td style="color:var(--p4);font-weight:600">TF Part 4</td><td style="text-align:left"><a class="code" href="https://tradetron.tech/strategy/9930702" target="_blank" rel="noopener">tradetron.tech/strategy/9930702</a></td><td><a class="copy lbtn" href="https://tradetron.tech/strategy/9930702" target="_blank" rel="noopener">Open</a></td></tr><tr><td style="color:var(--p5);font-weight:600">TF Part 5</td><td style="text-align:left"><a class="code" href="https://tradetron.tech/strategy/10356150" target="_blank" rel="noopener">tradetron.tech/strategy/10356150</a></td><td><a class="copy lbtn" href="https://tradetron.tech/strategy/10356150" target="_blank" rel="noopener">Open</a></td></tr></tbody></table></div>
     </section>
     <section class="card"><h2>Before you deploy</h2><div class="prose">
       <ul>
@@ -425,18 +427,6 @@ function renderCorr(S,labels){
   const bg=r=>r==null?css("--soft"):r>=0?`rgba(37,99,235,${(.08+.77*Math.min(1,r)).toFixed(3)})`:`rgba(220,38,38,${(.08+.77*Math.min(1,-r)).toFixed(3)})`;
   const fg=r=>r!=null&&Math.abs(r)>.55?"#fff":"inherit";
   document.getElementById("corr").innerHTML=`<thead><tr><th></th>${NAMES.slice(0,5).map((n,k)=>`<th style="color:${C[k]}">${short(n)}</th>`).join("")}</tr></thead><tbody>${M.map((row,i)=>`<tr><th style="color:${C[i]}">${short(NAMES[i])}</th>${row.map((c,j)=>i===j?`<td class="diag">1.00</td>`:`<td style="background:${bg(c.r)};color:${fg(c.r)}" title="${NAMES[i]} vs ${NAMES[j]}: ${c.r==null?"not enough data":c.r.toFixed(2)} over ${c.n} days">${c.r==null?"—":c.r.toFixed(2)}</td>`).join("")}</tr>`).join("")}</tbody>`;
-  const pairs=[]; for(let i=0;i<5;i++)for(let j=i+1;j<5;j++) if(M[i][j].r!=null) pairs.push({i,j,r:M[i][j].r});
-  const f=r=>(r>0?"+":"")+r.toFixed(2);
-  if(pairs.length){
-    const avg=pairs.reduce((a,p)=>a+p.r,0)/pairs.length;
-    pairs.sort((a,b)=>b.r-a.r);
-    const hi=pairs[0],lo=pairs[pairs.length-1];
-    document.getElementById("cAvg").textContent=f(avg);
-    document.getElementById("cAvgS").textContent=avg<0.3?"Low — good diversification":avg<0.6?"Moderate":"High — parts often move together";
-    document.getElementById("cHi").textContent=`${short(NAMES[hi.i])} & ${short(NAMES[hi.j])}  ${f(hi.r)}`;
-    document.getElementById("cLo").textContent=`${short(NAMES[lo.i])} & ${short(NAMES[lo.j])}  ${f(lo.r)}`;
-  }
-  document.getElementById("cN").textContent=idx.length;
 }
 
 let lastData=null;
